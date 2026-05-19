@@ -88,6 +88,9 @@ int main()
             // Choices in the playlist's window!
             vector<string> playlistChoices = {"Create new playlist", "Open existing playlist", "Exit playlists"};
 
+            // Choices in the queue's window!
+            vector<string> queueChoices = {"View current queue", "Delete current queue", "Exit queue"};
+
             if(pointerRow != choices.size() - 1) {
                 // Handling playlists!
                 if(choices[pointerRow] == "Playlists") {
@@ -130,6 +133,7 @@ int main()
                         else if(innerUserInput == KEY_ENTER || innerUserInput == '\n') {
                             // The other options!
                             if(innerRow != playlistChoices.size() - 1) {
+                                // A window for that specific option goes here!
                                 continue;
                             }
                             // Exit!
@@ -147,7 +151,59 @@ int main()
 
                 // Handling queues!
                 else {
-                    break;
+                    while(true) {
+                        wclear(innerWindow);
+                        mvwprintw(innerWindow, innerRow, innerColumn, "> ");
+                        for(int index = 0; index < playlistChoices.size(); index++) {
+                            if(index != innerRow) {
+                                mvwprintw(innerWindow, index, 2, "%s", queueChoices[index].c_str());
+                            }
+                            else {
+                                wattron(innerWindow, A_REVERSE);
+                                mvwprintw(innerWindow, index, 2, "%s", queueChoices[index].c_str());
+                                wattroff(innerWindow, A_REVERSE);
+                            }
+                        }
+                        wrefresh(innerWindow);
+    
+                        int innerUserInput = wgetch(innerWindow);
+                        if(innerUserInput == KEY_UP) {
+                            // Only move the pointer up-ward when it's on-screen, else don't!
+                            if(innerRow > 0) {
+                                innerRow--;
+                            }
+                            else {
+                                continue;
+                            }
+                        }
+                    
+                        else if(innerUserInput == KEY_DOWN) {
+                            // Only move the pointer down-ward when it's in bounds of choices, else don't!
+                            if(innerRow < queueChoices.size() - 1) {
+                                innerRow++;
+                            }
+                            else {
+                                continue;
+                            }
+                        }
+
+                        else if(innerUserInput == KEY_ENTER || innerUserInput == '\n') {
+                            // The other options!
+                            if(innerRow != queueChoices.size() - 1) {
+                                // A window for that specific option goes here!
+                                continue;
+                            }
+                            // Exit!
+                            else {
+                                delwin(innerWindow);
+                                break;
+                            }
+                        }
+
+                        else {
+                            continue;
+                        }
+                    }
                 }
             }
             else {
