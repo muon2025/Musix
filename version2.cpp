@@ -96,14 +96,15 @@ int main()
                 if(choices[pointerRow] == "Playlists") {
                     while(true) {
                         wclear(innerWindow);
-                        mvwprintw(innerWindow, innerRow, innerColumn, "> ");
+                        box(innerWindow, 0, 0);
+                        mvwprintw(innerWindow, innerRow + 1, innerColumn + 1, "> ");
                         for(int index = 0; index < playlistChoices.size(); index++) {
                             if(index != innerRow) {
-                                mvwprintw(innerWindow, index, 2, "%s", playlistChoices[index].c_str());
+                                mvwprintw(innerWindow, index + 1, 3, "%s", playlistChoices[index].c_str());
                             }
                             else {
                                 wattron(innerWindow, A_REVERSE);
-                                mvwprintw(innerWindow, index, 2, "%s", playlistChoices[index].c_str());
+                                mvwprintw(innerWindow, index + 1, 3, "%s", playlistChoices[index].c_str());
                                 wattroff(innerWindow, A_REVERSE);
                             }
                         }
@@ -153,14 +154,15 @@ int main()
                 else {
                     while(true) {
                         wclear(innerWindow);
-                        mvwprintw(innerWindow, innerRow, innerColumn, "> ");
-                        for(int index = 0; index < playlistChoices.size(); index++) {
+                        box(innerWindow, 0, 0);
+                        mvwprintw(innerWindow, innerRow + 1, innerColumn + 1, "> ");
+                        for(int index = 0; index < queueChoices.size(); index++) {
                             if(index != innerRow) {
-                                mvwprintw(innerWindow, index, 2, "%s", queueChoices[index].c_str());
+                                mvwprintw(innerWindow, index + 1, 3, "%s", queueChoices[index].c_str());
                             }
                             else {
                                 wattron(innerWindow, A_REVERSE);
-                                mvwprintw(innerWindow, index, 2, "%s", queueChoices[index].c_str());
+                                mvwprintw(innerWindow, index + 1, 3, "%s", queueChoices[index].c_str());
                                 wattroff(innerWindow, A_REVERSE);
                             }
                         }
