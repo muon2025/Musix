@@ -184,28 +184,31 @@ void viewQueue(WINDOW *innerWindow, vector<string> &queue, int queuePointer) {
     wrefresh(innerWindow);
 }
 
-void playSong(WINDOW *innerWindow, string songPath) {
+int playSong(WINDOW *innerWindow, vector<string> &songs, int index) {
+    string songPath = songs[index];
     Mix_Music *song = Mix_LoadMUS(songPath.c_str());
     if (song == NULL) {
         wclear(innerWindow);
         box(innerWindow, 0, 0);
-
         mvwprintw(innerWindow, 5, 2, "Failed to load song!");
         mvwprintw(innerWindow, 7, 2, "%s", Mix_GetError());
-
         wrefresh(innerWindow);
         wgetch(innerWindow);
-        return;
+        return index;
     }
-    Mix_PlayMusic(song, 1);
 
-    while (Mix_PlayingMusic()) {
+    Mix_PlayMusic(song, 1);
+    bool paused = false;
+
+    while (Mix_PlayingMusic() || paused) {
         wclear(innerWindow);
         box(innerWindow, 0, 0);
 
         mvwprintw(innerWindow, 2, 2, "NOW PLAYING:");
         mvwprintw(innerWindow, 4, 4, "%s", songPath.c_str());
-        mvwprintw(innerWindow, 7, 2, "Press Q to stop playback");
+        mvwprintw(innerWindow, 6, 2, paused ? "[ PAUSED ]" : "[ PLAYING ]");
+        mvwprintw(innerWindow, 8, 2, "P: Pause | C: Continue | B: Restart | Q: Stop");
+        mvwprintw(innerWindow, 9, 2, "N: Next   | S: Previous");
 
         wrefresh(innerWindow);
         timeout(100);
@@ -213,11 +216,53 @@ void playSong(WINDOW *innerWindow, string songPath) {
         int input = getch();
         if (input == 'q' || input == 'Q') {
             Mix_HaltMusic();
-            break;
+            Mix_FreeMusic(song);
+            return index;
         }
+        else if (input == 'p' || input == 'P') {
+            if (!paused) { Mix_PauseMusic(); paused = true; }
+        }
+        else if (input == 'c' || input == 'C') {
+            if (paused) { Mix_ResumeMusic(); paused = false; }
+        }
+        else if (input == 'b' || input == 'B') {
+            Mix_RewindMusic();
+            paused = false;
+        }
+        else if (input == 'n' || input == 'N') {
+            Mix_HaltMusic();
+            Mix_FreeMusic(song);
+            if (index + 1 >= songs.size()) {
+                wclear(innerWindow);
+                box(innerWindow, 0, 0);
+                mvwprintw(innerWindow, 5, 2, "End of List!");
+                mvwprintw(innerWindow, 7, 2, "Press any key to continue.");
+                wrefresh(innerWindow);
+                wgetch(innerWindow);
+                return index;
+            }
+            return playSong(innerWindow, songs, index + 1);
+        }
+        else if (input == 's' || input == 'S') {
+            Mix_HaltMusic();
+            Mix_FreeMusic(song);
+            if (index - 1 < 0) {
+                wclear(innerWindow);
+                box(innerWindow, 0, 0);
+                mvwprintw(innerWindow, 5, 2, "End of List!");
+                mvwprintw(innerWindow, 7, 2, "Press any key to continue.");
+                wrefresh(innerWindow);
+                wgetch(innerWindow);
+                return index;
+            }
+            return playSong(innerWindow, songs, index - 1);
+        }
+
         this_thread::sleep_for(chrono::milliseconds(100));
     }
+
     Mix_FreeMusic(song);
+    return index;
 }
 
 int main()
@@ -386,6 +431,7 @@ int main()
             vector<string> queueChoices = {"Add song path", "Delete from queue", "View current queue", "Play selected song", "Delete current queue", "Exit queue"};
 
             if (pointerRow != choices.size() - 1) {
+                //playlist handling
                 if (choices[pointerRow] == "Playlists") {
                     while (true) {
                         redrawScreen(innerWindow, innerRow, innerColumn, playlistChoices);
@@ -488,7 +534,7 @@ int main()
                                                             songPointer++;
                                                         }
                                                         else if(songInput == KEY_ENTER || songInput == '\n') {
-                                                            playSong(innerWindow, playlistSongs[currentPlaylist][songPointer]);
+                                                           songPointer = playSong(innerWindow, playlistSongs[currentPlaylist], songPointer);
                                                         }
                                                         else if(songInput == 26) {
                                                             break;
@@ -542,7 +588,7 @@ int main()
                         }
                     }
                 }
-
+                //queue handling
                 else {
                     while (true) {
                         redrawScreen(innerWindow, innerRow, innerColumn, queueChoices);
@@ -629,7 +675,7 @@ int main()
                                         queuePointer++;
                                     }
                                     else if (queueInput == KEY_ENTER || queueInput == '\n') {
-                                        playSong(innerWindow,queue[queuePointer]);
+                                        queuePointer = playSong(innerWindow, queue, queuePointer);
                                     }
                                     // Ctrl + Z to exit the window!
                                     else if (queueInput == 26) {
