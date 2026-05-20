@@ -2,6 +2,8 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <ctime>
+#include <cstdlib>
 #include <map>
 #include <thread>
 #include <chrono>
@@ -182,6 +184,62 @@ void viewQueue(WINDOW *innerWindow, vector<string> &queue, int queuePointer) {
         }
     }
     wrefresh(innerWindow);
+}
+
+void shuffleQueue(WINDOW *innerWindow, vector<string> &queue) {
+    srand(time(0));
+    for (int i = queue.size() - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        swap(queue[i], queue[j]);
+    }
+    wclear(innerWindow);
+    box(innerWindow, 0, 0);
+    mvwprintw(innerWindow, 5, 2, "Queue shuffled!");
+    mvwprintw(innerWindow, 7, 2, "Press any key to continue.");
+    wrefresh(innerWindow);
+    wgetch(innerWindow);
+}
+
+void reorderQueue(WINDOW *innerWindow, vector<string> &queue) {
+    echo();
+    curs_set(1);
+    wclear(innerWindow);
+    box(innerWindow, 0, 0);
+    // Display queue with indices
+    mvwprintw(innerWindow, 1, 2, "Current Queue:");
+    for (int i = 0; i < queue.size(); i++) {
+        mvwprintw(innerWindow, 3 + i, 2, "%d: %s", i + 1, queue[i].c_str());
+    }
+    // Get first index
+    char input1[4], input2[4];
+    mvwprintw(innerWindow, 3 + queue.size() + 1, 2, "Swap song number: ");
+    wmove(innerWindow, 3 + queue.size() + 1, 20);
+    wrefresh(innerWindow);
+    wgetnstr(innerWindow, input1, 3);
+    // Get second index
+    mvwprintw(innerWindow, 3 + queue.size() + 2, 2, "With song number: ");
+    wmove(innerWindow, 3 + queue.size() + 2, 20);
+    wrefresh(innerWindow);
+    wgetnstr(innerWindow, input2, 3);
+    int pos1 = atoi(input1) - 1;  // convert to 0-based
+    int pos2 = atoi(input2) - 1;
+    wclear(innerWindow);
+    box(innerWindow, 0, 0);
+
+    if (pos1 < 0 || pos1 >= queue.size() || pos2 < 0 || pos2 >= queue.size()) {
+        mvwprintw(innerWindow, 5, 2, "Invalid song numbers!");
+    } else if (pos1 == pos2) {
+        mvwprintw(innerWindow, 5, 2, "Same song selected, nothing changed.");
+    } else {
+        swap(queue[pos1], queue[pos2]);
+        mvwprintw(innerWindow, 5, 2, "Songs swapped successfully!");
+    }
+
+    mvwprintw(innerWindow, 7, 2, "Press any key to continue.");
+    wrefresh(innerWindow);
+    wgetch(innerWindow);
+    noecho();
+    curs_set(0);
 }
 
 int playSong(WINDOW *innerWindow, vector<string> &songs, int index) {
@@ -427,8 +485,7 @@ int main()
             keypad(innerWindow,TRUE);
 
             vector<string> playlistChoices = {"Create new playlist", "Open existing playlist", "Exit playlists"};
-
-            vector<string> queueChoices = {"Add song path", "Delete from queue", "View current queue", "Play selected song", "Delete current queue", "Exit queue"};
+            vector<string> queueChoices = {"Add song path", "Delete from queue", "View current queue", "Play selected song", "Shuffle queue", "Reorder queue", "Delete current queue", "Exit queue"};
 
             if (pointerRow != choices.size() - 1) {
                 //playlist handling
@@ -683,9 +740,33 @@ int main()
                                     }
                                 }
                             }
-
-                            // Delete entire queue!
+                            // Shuffle queue
                             else if (innerRow == 4) {
+                                if (queue.empty()) {
+                                    wclear(innerWindow);
+                                    box(innerWindow, 0, 0);
+                                    mvwprintw(innerWindow, 5, 2, "Queue is empty!");
+                                    wrefresh(innerWindow);
+                                    wgetch(innerWindow);
+                                    continue;
+                                }
+                                shuffleQueue(innerWindow, queue);
+                            }
+
+                            // Reorder queue
+                            else if (innerRow == 5) {
+                                if (queue.empty()) {
+                                    wclear(innerWindow);
+                                    box(innerWindow, 0, 0);
+                                    mvwprintw(innerWindow, 5, 2, "Queue is empty!");
+                                    wrefresh(innerWindow);
+                                    wgetch(innerWindow);
+                                    continue;
+                                }
+                                reorderQueue(innerWindow, queue);
+                            }
+                            // Delete entire queue!
+                            else if (innerRow == 6) {
                                 queue.clear();
                                 wclear(innerWindow);
                                 box(innerWindow,0,0);
