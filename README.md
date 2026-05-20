@@ -12,9 +12,9 @@ MUSIX combines a retro terminal UI with real audio playback, playlist management
 ┌──────────────────────────────────────────┐
 │                 MUSIX                    │
 ├──────────────────────────────────────────┤
-│ > Playlists                             │
-│   Queue                                 │
-│   Exit                                  │
+│ > Playlists                              │
+│   Queue                                  │
+│   Exit                                   │
 └──────────────────────────────────────────┘
 ```
 
