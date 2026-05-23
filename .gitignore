@@ -1,0 +1,8 @@
+# Compiled object files!
+object/
+
+# The final executable!
+musix
+
+# Local application data!
+*.dat

@@ -1,275 +1,95 @@
-# MUSIX 
+# Musix
 
-A fully terminal-based music player written in C++ using `ncurses` and `SDL2_mixer`.
+A sleep, minimalist and highly-responsive terminal-based music player written in C++.
 
-MUSIX combines a retro terminal UI with real audio playback, playlist management, queue systems, persistent storage, and interactive controls — all running directly inside the Linux terminal.
+## Key Features
 
----
+1. **Minimalist Text-based User Interface:** Edge-to-edge solid selection bars, dynamic window centering and terminal transparency support.
 
-# Preview
+2. **Advanced Playback Engine:** 
+	- Real-time, two-tone dynamic progress bar displaying elapsed time and total time.
+	- Auto-advances to the next song seamlessly.
+	- Native controls for pause, resume, stop, next, previous and restart.
 
-```txt
-┌──────────────────────────────────────────┐
-│                 MUSIX                    │
-├──────────────────────────────────────────┤
-│ > Playlists                              │
-│   Queue                                  │
-│   Exit                                   │
-└──────────────────────────────────────────┘
-```
+3. **Smart Library Management:** Create, edit and manage multiple custom playlists.
 
-Animated startup logo:
+4. **Interactive Queue System:** Add, delete, shuffle, re-order or clear the queue.
 
-```txt
-M U S I X
-```
+5. Automatically truncate absolute long file paths to display clean track names.
 
-drawn dynamically using ncurses frame-by-frame rendering.
+6. **Persistent Data:** Queues and playlists are automatically serialized to local '.dat' files and restored on your next session.
 
----
+7. **Fluid Navigation:** Ctrl + Z logic to back out of menus or cancel text-inputs instantly without breaking the UI flow. 
 
-# Features
+## Project Structure
 
-## Terminal UI
-- Built completely using `ncurses`
-- Interactive menu system
-- Keyboard navigation
-- Real-time window updates
-- Dynamic rendering
-- Animated startup splash-screen
+Musix is built with a modular, maintainable C++ architecture.
 
----
-
-## Real Audio Playback
-Powered by `SDL2_mixer`.
-
-Supports:
-- MP3 playback
-- Pause / Resume
-- Restart track
-- Next song
-- Previous song
-- Stop playback
-
-Playback controls:
-
-| Key | Action |
-|---|---|
-| P | Pause |
-| C | Continue |
-| B | Restart |
-| N | Next Song |
-| S | Previous Song |
-| Q | Stop Playback |
-
----
-
-## Queue Management
-
-Features:
-- Add songs to queue
-- Delete songs from queue
-- View current queue
-- Shuffle queue
-- Reorder queue
-- Persistent queue storage
-- Playback directly from queue
-
----
-
-## Playlist System
-
-Features:
-- Create playlists
-- Add songs to playlists
-- Delete songs from playlists
-- Browse playlists
-- Play songs directly from playlists
-- Persistent playlist storage
-
----
-
-## Persistent Storage
-
-MUSIX automatically saves:
-- Queue data
-- Playlist names
-- Playlist songs
-
-Data persists across sessions using local `.dat` files.
-
----
-
-# Technologies Used
-
-| Technology | Purpose |
-|---|---|
-| C++ | Core application logic |
-| ncurses | Terminal UI |
-| SDL2 | Audio subsystem |
-| SDL2_mixer | Music playback |
-| STL | Data structures & algorithms |
-
----
-
-# Architecture
-
-The project follows a state-driven terminal UI architecture.
-
-Core concepts used:
-- Nested menu systems
-- Dynamic window rendering
-- Stateful navigation
-- Queue-based playback
-- Persistent file storage
-- Recursive audio playback navigation
-
----
-
-# Project Structure
-
-```txt
 Musix/
-│
-├── final_version.cpp
-├── queue.dat
-├── playlists.dat
-├── songs/
-│   ├── song1.mp3
-│   ├── song2.mp3
-│   └── ...
-```
+- include/
+	- audio.h
+	- data.h
+	- listoperations.h
+	- ui.h
+- source/
+	- audio.cpp
+	- data.cpp
+	- listoperations.cpp
+	- ui.cpp
+	- main.cpp
+- songs/
+- versions/
+- Makefile
+- README.md
 
----
+## Prerequisites
 
-# Installation
+To compile and run Musix, ensure you have g++, make and the required C++ development libraries installed on your system.
 
-## Fedora
+**For Ubuntu/Debian-based systems:**
+- sudo apt update
+- sudo apt install build-essential libncurses5-dev libncursesw5-dev libsdl2-dev libsdl2-mixer-dev
 
-Install dependencies:
+**For Arch Linux:**
+- sudo pacman -S base-devel ncurses sld2 sdl2_mixer
 
-```
-sudo dnf install ncurses-devel SDL2 SDL2-devel SDL2_mixer SDL2_mixer-devel
-```
+## Installation and Build
 
----
+Musix uses a custom Makefile for rapid, modular compilation.
 
-# Compilation
+1. **Clone/download the repository and navigate to the project root:**
+	- cd path/to/Musix
 
-```
-g++ main.cpp -std=c++17 -lncurses -lSDL2 -lSDL2_mixer
-```
+2. **Compile the project using make:**
+	- make
 
----
+3. **Run the application:**
+	- ./musix
 
-# Running
+*Note: To remove compiled object files and the executable, run* **make clean**.
 
-```
-./a.out
-```
+## Controls and Keybindings
 
----
+1. **Menu Navigation**
+	- ↑/↓ - Navigate through menu options
+	- Enter - Select an option or confirm text-input
+	- Ctrl + Z - Return to the previous menu or cancel active text-input
+	- Backspace - Delete characters during text-input
 
-# Adding Songs
+2. **Audio Playback**
+	- P - Pause play-back
+	- C - Continue/Resume play-back
+	- B - Restart the current track
+	- N - Skip to the next track
+	- S - Skip to the previous track
+	- Q - Quit play-back and return to the menu
 
-Create a `songs/` folder:
+## Usage Notes
 
-```bash
-mkdir songs
-```
+- **Audio Formats:** Play-back compatibility depends on your local SDL2_mixer configuration, but natively supports .mp3, .wav, .ogg and .flac.
 
-Place your `.mp3` files inside:
+- **Adding Songs:** When prompted for a 'Song Path', you can either provide the:
+	1. Absolute file path on your machine, such as /home/user/Music/track.mp3, or
+	2. Relative file path by placing the track in the provided 'songs' directory, such as songs/track.mp3.
 
-```txt
-songs/starboy.mp3
-songs/phonk.mp3
-songs/interstellar.mp3
-```
-
-Then inside MUSIX:
-- Queue → Add song path
-- Enter:
-
-```txt
-songs/starboy.mp3
-```
-
----
-
-# Navigation
-
-| Key | Action |
-|---|---|
-| ↑ / ↓ | Move selection |
-| ENTER | Select |
-| CTRL + Z | Exit sub-window |
-| CTRL + Q | Quit application |
-
----
-
-# Queue Features
-
-## Shuffle Queue
-Randomizes queue order using Fisher-Yates shuffle.
-
-## Reorder Queue
-Swap positions of two songs directly by index.
-
----
-
-# Interesting Technical Features
-
-## Animated Splash Screen
-The startup logo is rendered point-by-point using coordinate vectors.
-
-## Recursive Song Playback
-Next/previous song playback is implemented recursively for cleaner navigation logic.
-
-## Dynamic Window Rendering
-Menus are continuously redrawn to simulate a real application UI inside the terminal.
-
-## Persistent Sessions
-Queues and playlists automatically reload when the application starts.
-
----
-
-# Future Improvements
-
-Planned upgrades:
-- Multi-panel UI
-- Volume control
-- Metadata extraction
-- Auto-directory scanning
-- Album art support
-- Search system
-- Theme customization
-- Threaded playback engine
-- Visual audio spectrum
-
----
-
-# Why This Project Is Interesting
-
-MUSIX is not just a basic ncurses menu app.
-
-It combines:
-- systems programming
-- terminal rendering
-- real-time input handling
-- multimedia playback
-- persistent storage
-- UI state management
-
-into a fully interactive terminal application.
-
-The project demonstrates:
-- low-level UI programming
-- event-driven architecture
-- Linux multimedia integration
-- advanced C++ STL usage
-
----
-
-# Author
-
-Built by Sidharth Vutukuru and Vinay Kumar Das
+- **Data Files:** Running the app will generate queue.dat and playlists.dat in your project root. Deleting these files resets your Musix library, but does not affect your actual audio files.
